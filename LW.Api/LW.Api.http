@@ -1,0 +1,21 @@
+@LW.Api_HostAddress = https://localhost:7160
+
+
+GET {{LW.Api_HostAddress}}/translator/generate
+Authorization: Bearer <token>
+###
+
+GET {{LW.Api_HostAddress}}/translator/languages-available
+
+###
+
+POST {{LW.Api_HostAddress}}/translator/generate
+Content-Type: application/json
+
+{
+  "fromLanguage": "en-US",
+  "toLanguage": "fr-FR",
+  "inputText": "The future belongs to those who believe in the beauty of their dreams. -Eleanor Roosevelt"
+}
+
+###

@@ -1,0 +1,30 @@
+﻿# Base image for runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+# Build image for building the project
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+
+# Copy project files for LW.Api and dependencies like LW.Application
+COPY ["LW.Api/LW.Api.csproj", "LW.Api/"]
+COPY ["LW.Application/LW.Application.csproj", "LW.Application/"]
+
+# Restore dependencies for LW.Api
+RUN dotnet restore "LW.Api/LW.Api.csproj"
+COPY . .
+
+WORKDIR "/src/LW.Api"
+RUN dotnet build "LW.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "LW.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
+
+# Final runtime image
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "LW.Api.dll"]

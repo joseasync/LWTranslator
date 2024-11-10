@@ -1,0 +1,83 @@
+﻿@page "/translator"
+@using Microsoft.AspNetCore.Authorization
+@using LW.Client.Services
+@inject ITranslationService translationService
+
+@attribute [Authorize]
+<PageTitle>Translator</PageTitle>
+
+<h1>Translator</h1>
+ @if(!string.IsNullOrEmpty(error))
+{
+        <div class="alert alert-danger">@error</div>
+}
+<div class="translation-container">
+    <div class="language-section">
+        <label for="fromLanguage">From:</label>
+        <select id="fromLanguage" @bind="selectedFromLanguage">
+            @foreach (var language in availableLanguages)
+            {
+                <option value="@language.Key">@language.Value</option>
+            }
+        </select>
+        <textarea class="translation-text-area" @bind="inputText" placeholder="Enter text to translate"></textarea>
+    </div>
+
+    <div class="language-section">
+        <label for="toLanguage">To:</label>
+        <select id="toLanguage" @bind="selectedToLanguage">
+            @foreach (var language in availableLanguages)
+            {
+                <option value="@language.Key">@language.Value</option>
+            }
+        </select>
+        <textarea class="translation-text-area" readonly placeholder="Translation result">@translatedText</textarea>
+    </div>
+</div>
+
+<button class="btn btn-primary" @onclick="TranslateText">Translate</button>
+
+@code {
+    private Dictionary<string, string> availableLanguages = new();
+    private string selectedFromLanguage;
+    private string selectedToLanguage;
+    private string inputText;
+    private string translatedText;
+    private string error = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            availableLanguages = await translationService.GetLanguages();
+            if (availableLanguages.Any())
+            {
+                selectedFromLanguage = availableLanguages.Keys.First();
+                selectedToLanguage = availableLanguages.Keys.First();
+            }
+        }
+        catch(Exception ex)
+        {
+            error = "Unexpected error while retrieving the available languages. Please contact support.";
+        }
+    }
+
+    private async Task TranslateText()
+    {
+        error = string.Empty;
+        if (string.IsNullOrWhiteSpace(inputText) || string.IsNullOrEmpty(selectedFromLanguage) || string.IsNullOrEmpty(selectedToLanguage))
+        {
+            error = "Please enter text and select both languages";
+            return;
+        }
+        try
+        {
+            var translationResult = await translationService.GenerateTranslation(selectedFromLanguage, selectedToLanguage, inputText);
+            translatedText = translationResult.Text;
+        }
+        catch(Exception ex)
+        {
+            error = "Unexpected error while generating the translation. Please contact support.";
+        }
+    }
+}

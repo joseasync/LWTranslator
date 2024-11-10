@@ -1,0 +1,24 @@
+﻿version: '3.9'
+
+
+services:
+  blazorapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      - "7200:7200"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - GOOGLE_TRANSLATE_API_KEY=
