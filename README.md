@@ -4,7 +4,7 @@ The **LWTranslator** project is a web-based application built with Blazor for th
 
 ### Demo
 
-[![LWTranslator Application - Demo]()](https://youtu.be/9eljBy4wmnA)
+[![LWTranslator Application - Demo](https://github.com/user-attachments/assets/a13c884c-907e-466c-8c9d-999b9642dda4)](https://youtu.be/9eljBy4wmnA)
 
 
 <br>
